@@ -38,8 +38,32 @@ export type TakjilSpot = {
   isSellerManaged: boolean
   sellerContact?: string
 
-  // TTL
   expiresAt: number
+
+  // Abuse Reports Tracking
+  abuseReportsCount?: Record<AbuseReportReason, number>
+
+  comments?: SpotComment[]
+}
+
+export type SpotComment = {
+  id: string
+  userId: string
+  userName: string
+  text: string
+  createdAt: number
+  updatedAt?: number
+}
+
+export type AbuseReportReason = 'fraud' | 'misinformation' | 'inappropriate_image' | 'closed_permanently' | 'other';
+
+export type AbuseReport = {
+  id: string
+  spotId: string
+  reason: AbuseReportReason
+  note?: string
+  reportedBy: string
+  reportedAt: number
 }
 
 export type SpotReport = {

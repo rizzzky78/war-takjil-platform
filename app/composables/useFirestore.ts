@@ -1,7 +1,7 @@
-import { collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, orderBy, limit, startAt, endAt } from 'firebase/firestore'
+import { collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, orderBy, limit, startAt, endAt, arrayUnion, arrayRemove } from 'firebase/firestore'
 import { useNuxtApp } from '#app'
 import { getGeohashBounds } from '../utils/geohash'
-import type { TakjilSpot, SpotReport, AppUser } from '../types'
+import type { TakjilSpot, SpotReport, AppUser, AbuseReport, AbuseReportReason, SpotComment } from '../types'
 import { QUERY_LIMIT } from '../utils/constants'
 
 export const useFirestore = () => {
@@ -105,6 +105,68 @@ export const useFirestore = () => {
     return null
   }
 
+  const submitAbuseReport = async (
+    spotId: string,
+    currentSpot: TakjilSpot,
+    report: Omit<AbuseReport, 'id' | 'spotId'>
+  ): Promise<{ removed: boolean; id: string }> => {
+    // 1. Add report to subcollection
+    const abuseReportsRef = collection($db, `spots/${spotId}/abuseReports`)
+    const newReportRef = doc(abuseReportsRef)
+    await setDoc(newReportRef, { ...report, id: newReportRef.id, spotId })
+
+    // 2. Increment count and fetch new count
+    const reason = report.reason
+    // Get current count for this specific reason safely
+    const currentCount = currentSpot.abuseReportsCount?.[reason] || 0
+    const newCount = currentCount + 1
+
+    // 3. Update the spot document
+    const spotRef = doc($db, 'spots', spotId)
+    const updates: Partial<TakjilSpot> = {
+      [`abuseReportsCount.${reason}`]: newCount,
+    }
+
+    let removed = false
+
+    // 4. Check deletion threshold (10 reports for the SAME reason)
+    if (newCount >= 10) {
+      // Set expiresAt to 0 to immediately hide it from client queries 
+      // and let Firestore TTL clean it up eventually
+      updates.expiresAt = 0
+      removed = true
+    }
+
+    await updateDoc(spotRef, updates as any) // Typecast due to dot notation
+
+    return { removed, id: newReportRef.id }
+  }
+
+  const addComment = async (spotId: string, comment: SpotComment) => {
+    const spotRef = doc($db, 'spots', spotId)
+    await updateDoc(spotRef, {
+      comments: arrayUnion(comment)
+    })
+  }
+
+  const updateComment = async (spotId: string, oldComment: SpotComment, newComment: SpotComment) => {
+    const spotRef = doc($db, 'spots', spotId)
+    // Firestore array updates require removing the exact old object, then adding the new one
+    await updateDoc(spotRef, {
+      comments: arrayRemove(oldComment)
+    })
+    await updateDoc(spotRef, {
+      comments: arrayUnion(newComment)
+    })
+  }
+
+  const deleteComment = async (spotId: string, comment: SpotComment) => {
+    const spotRef = doc($db, 'spots', spotId)
+    await updateDoc(spotRef, {
+      comments: arrayRemove(comment)
+    })
+  }
+
   return {
     getSpotsInRadius,
     getSpot,
@@ -113,6 +175,10 @@ export const useFirestore = () => {
     deleteSpot,
     addReport,
     getSpotReports,
-    getUserProfile
+    getUserProfile,
+    submitAbuseReport,
+    addComment,
+    updateComment,
+    deleteComment
   }
 }

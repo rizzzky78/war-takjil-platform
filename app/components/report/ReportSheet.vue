@@ -141,20 +141,19 @@ const onSubmit = async (data: ReportFormData) => {
         <DialogTitle class="text-xl">
           {{ mode === 'update' ? 'Update Takjil Spot' : 'Add New Takjil Spot' }}
         </DialogTitle>
-        <DialogDescription v-if="mode === 'create'" class="text-xs">
-          Help others find good takjil! This pin will disappear automatically after 2 hours.
+        <DialogDescription v-if="mode === 'create'" class="text-sm">
+          Bantu sesama menemukan takjil terbaik! Pin ini akan otomatis hilang setelah 2 jam.
         </DialogDescription>
-        <DialogDescription v-else class="text-xs">
-          Update the status of this spot to help others know if it's still available.
+        <DialogDescription v-else class="text-sm">
+          Update status spot ini untuk membantu orang lain mengetahui apakah masih tersedia.
         </DialogDescription>
       </DialogHeader>
 
       <div v-if="!isSignedIn"
         class="p-6 text-center border rounded-lg bg-muted flex flex-col items-center justify-center space-y-3">
-        <p class="text-sm font-medium">You must be logged in to report spots.</p>
-        <div class="flex w-full gap-2 mt-2">
-          <Button variant="outline" class="flex-1" @click="() => $emit('update:open', false)">Cancel</Button>
-          <Button class="flex-1" @click="() => signIn()">Sign In / Register</Button>
+        <p class="text-sm font-medium">Kamu harus login untuk melaporkan spot.</p>
+        <div class="flex w-full gap-2 mt-2 justify-center">
+          <Button class="rounded-full" size="lg" @click="() => signIn()">Sign In / Register</Button>
           <!-- Show the user button when the user is signed in -->
         </div>
       </div>

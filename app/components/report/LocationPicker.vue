@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { LMap, LTileLayer } from '@vue-leaflet/vue-leaflet'
-import { MapPin, Navigation } from 'lucide-vue-next'
+import { Crosshair, MapPin } from 'lucide-vue-next'
 import { useGeolocation } from '~/composables/useGeolocation'
 import { Button } from '@/components/ui/button'
 
@@ -60,8 +60,8 @@ const centerOnMe = () => {
   <div class="space-y-2">
     <div class="flex justify-between items-center">
       <h4 class="text-sm font-medium">Pin Location</h4>
-      <Button variant="ghost" size="sm" class="h-8 gap-1 text-primary" @click.prevent="centerOnMe">
-        <Navigation class="w-4 h-4 ml-[-4px]" />
+      <Button variant="outline" size="sm" class="h-8 gap-2 text-primary" @click.prevent="centerOnMe">
+        <Crosshair class="w-4 h-4" />
         Use GPS
       </Button>
     </div>

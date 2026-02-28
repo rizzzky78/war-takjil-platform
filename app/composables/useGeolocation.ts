@@ -1,8 +1,8 @@
-import { useGeolocation as useVueUseGeolocation } from '@vueuse/core'
+import { useGeolocation as useVueUseGeolocation, createSharedComposable } from '@vueuse/core'
 import { computed, watchEffect } from 'vue'
 import { toast } from 'vue-sonner'
 
-export const useGeolocation = () => {
+export const useGeolocation = createSharedComposable(() => {
   const { coords, locatedAt, error, resume, pause } = useVueUseGeolocation({
     enableHighAccuracy: true,
   })
@@ -28,4 +28,4 @@ export const useGeolocation = () => {
     startWatch: resume,
     stopWatch: pause
   }
-}
+})

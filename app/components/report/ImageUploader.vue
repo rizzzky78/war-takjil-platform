@@ -33,7 +33,7 @@ const onFileSelected = async (event: Event) => {
   if (!target.files || target.files.length === 0) return
 
   const selectedFiles = Array.from(target.files)
-  
+
   // Check limit
   if (props.modelValue.length + selectedFiles.length > maxImages) {
     toast.error(`You can only upload up to ${maxImages} images.`)
@@ -44,10 +44,10 @@ const onFileSelected = async (event: Event) => {
     try {
       // 1. Compress
       const compressedFile = await compressImage(file)
-      
+
       // 2. Upload
       const result = await uploadImage(compressedFile)
-      
+
       // 3. Emit update
       const newImage: UploadedImage = {
         url: result.url,
@@ -55,7 +55,7 @@ const onFileSelected = async (event: Event) => {
         publicId: result.publicId,
         type: props.modelValue.length === 0 ? 'booth' : 'menu' // First image is usually booth
       }
-      
+
       emit('update:modelValue', [...props.modelValue, newImage])
     } catch (err: any) {
       console.error('Failed to upload image:', err)
@@ -88,22 +88,12 @@ const triggerFileInput = () => {
 
     <!-- Image Previews Grid -->
     <div v-if="modelValue.length > 0" class="grid grid-cols-3 gap-2">
-      <div 
-        v-for="(img, idx) in modelValue" 
-        :key="img.publicId"
-        class="relative aspect-square rounded-md overflow-hidden bg-muted group"
-      >
-        <img 
-          :src="img.thumbnailUrl" 
-          alt="Uploaded photo" 
-          class="w-full h-full object-cover"
-        />
+      <div v-for="(img, idx) in modelValue" :key="img.publicId"
+        class="relative aspect-square rounded-md overflow-hidden bg-muted group">
+        <img :src="img.thumbnailUrl" alt="Uploaded photo" class="w-full h-full object-cover" />
         <!-- Remove button -->
-        <button 
-          @click.prevent="removeImage(idx)"
-          type="button"
-          class="absolute top-1 right-1 p-1 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
-        >
+        <button @click.prevent="removeImage(idx)" type="button"
+          class="absolute top-1 right-1 p-1 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors">
           <X class="w-4 h-4" />
         </button>
         <!-- Type label -->
@@ -113,13 +103,8 @@ const triggerFileInput = () => {
       </div>
 
       <!-- Add more button if under limit -->
-      <button 
-        v-if="modelValue.length < maxImages"
-        type="button"
-        @click="triggerFileInput"
-        :disabled="isUploading"
-        class="aspect-square flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted/50 transition-colors disabled:opacity-50"
-      >
+      <button v-if="modelValue.length < maxImages" type="button" @click="triggerFileInput" :disabled="isUploading"
+        class="aspect-square flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 hover:bg-muted/50 transition-colors disabled:opacity-50">
         <Loader2 v-if="isUploading" class="w-6 h-6 animate-spin text-muted-foreground" />
         <ImagePlus v-else class="w-6 h-6 text-muted-foreground" />
         <span class="text-xs text-muted-foreground font-medium flex gap-1">
@@ -131,11 +116,9 @@ const triggerFileInput = () => {
 
     <!-- Empty State / Main Upload Button -->
     <div v-else>
-      <div 
-        @click="!isUploading && triggerFileInput()"
+      <div @click="!isUploading && triggerFileInput()"
         class="relative flex flex-col items-center justify-center gap-3 p-8 rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
-        :class="{ 'opacity-50 cursor-not-allowed': isUploading }"
-      >
+        :class="{ 'opacity-50 cursor-not-allowed': isUploading }">
         <div class="p-4 rounded-full bg-primary/10 text-primary">
           <Loader2 v-if="isUploading" class="w-8 h-8 animate-spin" />
           <Camera v-else class="w-8 h-8" />
@@ -145,20 +128,13 @@ const triggerFileInput = () => {
             {{ isUploading ? `Uploading... ${uploadProgress}%` : 'Take or upload a photo' }}
           </p>
           <p v-if="!isUploading" class="text-xs text-muted-foreground mt-1">
-            Max {{ maxImages }} photos. First photo should be the stall/cart.
+            Maks {{ maxImages }} foto. Foto pertama adalah foto lapak.
           </p>
         </div>
       </div>
     </div>
 
     <!-- Hidden file input -->
-    <input 
-      ref="fileInput"
-      type="file"
-      accept="image/*"
-      class="hidden"
-      multiple
-      @change="onFileSelected"
-    />
+    <input ref="fileInput" type="file" accept="image/*" class="hidden" multiple @change="onFileSelected" />
   </div>
 </template>

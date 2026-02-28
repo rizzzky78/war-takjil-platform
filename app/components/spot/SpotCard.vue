@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Card } from '~/components/ui/card'
+import { Card, CardFooter } from '~/components/ui/card'
 import SpotStatusBadge from './SpotStatusBadge.vue'
 import { formatRelativeTime } from '~/utils/time'
 import type { TakjilSpot } from '~/types'
@@ -86,7 +86,7 @@ const handleDelete = async () => {
 
 <template>
   <div v-if="spot" class="absolute bottom-10 md:bottom-4 left-4 right-4 z-[1000] animate-in slide-in-from-bottom-5">
-    <Card class="w-full relative shadow-xl border-t-4 border-t-primary cursor-pointer" @click="goToDetail">
+    <Card class="w-full relative shadow-xl border-t-4 border-t-green-700/50 cursor-pointer" @click="goToDetail">
 
       <!-- Actions Context (Top Right) -->
       <div class="absolute right-2 top-2 flex items-center gap-2 z-10">
@@ -149,10 +149,13 @@ const handleDelete = async () => {
 
           <div class="flex items-center gap-2 mt-2">
             <SpotStatusBadge :status="spot.status" />
-            <span class="text-xs text-gray-500 dark:text-gray-400">Update {{ timeAgo }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">Ditambahkan {{ timeAgo }}</span>
           </div>
         </div>
       </div>
+      <CardFooter>
+        <Button @click="goToDetail" class="w-full">Lihat Detail</Button>
+      </CardFooter>
     </Card>
   </div>
 </template>

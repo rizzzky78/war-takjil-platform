@@ -1,4 +1,5 @@
-import { formatDistanceToNow, isPast } from 'date-fns'
+import { formatDistanceToNow, isPast, } from 'date-fns'
+import { id } from 'date-fns/locale'
 import { TTL_2_HOURS } from './constants'
 
 /**
@@ -6,7 +7,7 @@ import { TTL_2_HOURS } from './constants'
  */
 export const formatRelativeTime = (timestampMs: number): string => {
   // `formatDistanceToNow` handles differences nicely. We'll add 'ago' suffix by default unless it returns something like "in 5 minutes".
-  return formatDistanceToNow(new Date(timestampMs), { addSuffix: true })
+  return formatDistanceToNow(new Date(timestampMs), { addSuffix: true, locale: id })
 }
 
 /**

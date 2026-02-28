@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { LMap, LTileLayer } from '@vue-leaflet/vue-leaflet'
+import { LMap, LTileLayer, LControlZoom } from '@vue-leaflet/vue-leaflet'
 import { useMap } from '~/composables/useMap'
 import { useGeolocation } from '~/composables/useGeolocation'
 import { useSpots } from '~/composables/useSpots'
 import SpotMarker from './SpotMarker.vue'
-import LocationButton from './LocationButton.vue'
 import { Loader2, MapPinOff, RefreshCcw } from 'lucide-vue-next'
 import type { TakjilSpot } from '~/types'
 
 const { center, zoom, setCenter, setBounds } = useMap()
-const { coords, isLocated, requestPermission, startWatch } = useGeolocation()
+const { coords, isLocated, startWatch } = useGeolocation()
 const { filteredSpots, loading, fetchSpots } = useSpots()
 
 const mapInstance = ref<any>(null)
@@ -37,14 +36,6 @@ const handleRefresh = () => {
   fetchSpots(currentCenter.lat, currentCenter.lng, 5000, true)
 }
 
-const handleLocationClick = () => {
-  requestPermission()
-  if (isLocated.value) {
-    setCenter(coords.value.latitude, coords.value.longitude)
-    fetchSpots(coords.value.latitude, coords.value.longitude, 5000)
-  }
-}
-
 watch(isLocated, (located) => {
   if (located) {
     setCenter(coords.value.latitude, coords.value.longitude)
@@ -65,10 +56,11 @@ const onSpotClick = (spot: TakjilSpot) => {
 <template>
   <div class="h-screen w-full relative">
     <LMap ref="map" v-model:zoom="zoom" v-model:center="center" :use-global-leaflet="false" @ready="handleMapReady"
-      @moveend="updateBounds" class="h-full w-full z-0">
+      @moveend="updateBounds" class="h-full w-full z-0" :options="{ zoomControl: false }">
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base" name="OpenStreetMap" />
 
       <SpotMarker v-for="spot in filteredSpots" :key="spot.id" :spot="spot" @click="onSpotClick" />
+      <LControlZoom position="topleft" class="!mt-20" />
     </LMap>
 
     <!-- Top Status Overlay (Loading / Empty) -->
@@ -89,7 +81,12 @@ const onSpotClick = (spot: TakjilSpot) => {
         </button>
       </div>
     </div>
-
-    <LocationButton :is-located="isLocated" @click="handleLocationClick" />
   </div>
 </template>
+
+<style scoped>
+:deep(.leaflet-top) {
+  margin-top: 5rem;
+  /* ~80px space from top, enough for the 48px logo + padding */
+}
+</style>

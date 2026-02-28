@@ -10,7 +10,15 @@ export default defineNuxtConfig({
     head: {
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' },
+        { name: 'theme-color', content: '#ffffff' }
       ],
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/favicon-96x96.png', sizes: '96x96' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'shortcut icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' }
+      ]
     },
   },
 
@@ -23,6 +31,11 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss() as any,
     ],
+    server: {
+      allowedHosts: [
+        "d04e-2001-448a-40b0-6e51-2db2-785f-7372-8279.ngrok-free.app"
+      ]
+    }
   },
   modules: ['shadcn-nuxt', '@vite-pwa/nuxt', '@clerk/nuxt'],
   pwa: {

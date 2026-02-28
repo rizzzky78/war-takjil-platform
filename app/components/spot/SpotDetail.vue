@@ -5,15 +5,22 @@ import SpotImageGallery from './SpotImageGallery.vue'
 import SpotStatusBadge from './SpotStatusBadge.vue'
 import { formatRelativeTime } from '~/utils/time'
 import { useFirestore } from '~/composables/useFirestore'
-import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation } from 'lucide-vue-next'
+import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag } from 'lucide-vue-next'
+import { useAppAuth } from '~/composables/useAppAuth'
+import SpotComments from './SpotComments.vue'
+import ReportAbuseDialog from './ReportAbuseDialog.vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   spot: TakjilSpot
 }>()
 
+const router = useRouter()
 const { getUserProfile } = useFirestore()
+const { isSignedIn } = useAppAuth()
 const uploader = ref<AppUser | null>(null)
 const isLoadingUploader = ref(true)
+const reportDialogOpen = ref(false)
 
 onMounted(async () => {
   if (props.spot.createdBy) {
@@ -28,9 +35,9 @@ const timeAgo = computed(() => {
 
 const priceLabel = computed(() => {
   switch (props.spot.priceRange) {
-    case 'under_10k': return '< Rp 10.000'
-    case '10k_20k': return 'Rp 10.000 - Rp 20.000'
-    case 'above_20k': return '> Rp 20.000'
+    case 'under_10k': return '< Rp 10K'
+    case '10k_20k': return 'Rp 10K - Rp 20K'
+    case 'above_20k': return '> Rp 20K'
     default: return 'Harga tidak diketahui'
   }
 })
@@ -55,6 +62,9 @@ const censorEmail = (email: string) => {
   return `${censoredName}@${domain}`
 }
 
+const handleSpotRemoved = () => {
+  router.push('/')
+}
 </script>
 
 <template>
@@ -117,7 +127,7 @@ const censorEmail = (email: string) => {
           <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border dark:border-gray-800">
             <Calendar class="w-5 h-5 text-primary mt-0.5" />
             <div class="flex flex-col">
-              <span class="text-xs font-medium text-gray-500">Waktu Penambahan</span>
+              <span class="text-xs font-medium text-gray-500">Waktu Ditambahkan</span>
               <span class="text-sm text-gray-800 dark:text-gray-200">{{ formatDateString(spot.createdAt) }}</span>
             </div>
           </div>
@@ -191,6 +201,29 @@ const censorEmail = (email: string) => {
         </div>
       </div>
 
+      <SpotComments :spot="spot" />
+
+      <!-- Report Abuse Section -->
+      <div v-if="isSignedIn" class="mt-4 mb-6">
+        <button @click="reportDialogOpen = true"
+          class="w-full flex items-center justify-center gap-2 py-3 text-red-600 dark:text-red-400 font-medium text-sm hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900/50">
+          <Flag class="w-4 h-4" />
+          Laporkan Spot / Penyalahgunaan
+        </button>
+      </div>
+
+    </div>
+
+    <ReportAbuseDialog :spot="spot" v-model:open="reportDialogOpen" @removed="handleSpotRemoved" />
+
+    <div class="text-center">
+      <p class="text-sm text-gray-500">Thank you for sharing!
+        <br />
+        <span>
+          Made with ❤️ by <a href="https://codebyrzky.site" target="_blank" rel="noopener noreferrer"
+            class="text-primary underline">Codebyrzky</a>
+        </span>
+      </p>
     </div>
   </div>
 </template>
