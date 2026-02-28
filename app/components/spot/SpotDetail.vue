@@ -5,7 +5,7 @@ import SpotImageGallery from './SpotImageGallery.vue'
 import SpotStatusBadge from './SpotStatusBadge.vue'
 import { formatRelativeTime } from '~/utils/time'
 import { useFirestore } from '~/composables/useFirestore'
-import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag } from 'lucide-vue-next'
+import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag, Coffee, Heart, Gift } from 'lucide-vue-next'
 import { useAppAuth } from '~/composables/useAppAuth'
 import SpotComments from './SpotComments.vue'
 import ReportAbuseDialog from './ReportAbuseDialog.vue'
@@ -68,7 +68,7 @@ const handleSpotRemoved = () => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full bg-background min-h-screen pb-20">
+  <div class="flex flex-col w-full bg-background min-h-screen pb-4">
     <SpotImageGallery :images="spot.images" />
 
     <div class="p-4 flex flex-col gap-4 mt-2">
@@ -216,14 +216,39 @@ const handleSpotRemoved = () => {
 
     <ReportAbuseDialog :spot="spot" v-model:open="reportDialogOpen" @removed="handleSpotRemoved" />
 
-    <div class="text-center">
-      <p class="text-sm text-gray-500">Thank you for sharing!
-        <br />
-        <span>
-          Made with ❤️ by <a href="https://codebyrzky.site" target="_blank" rel="noopener noreferrer"
-            class="text-primary underline">Codebyrzky</a>
-        </span>
-      </p>
+    <div class="mt-4 mx-4">
+      <div
+        class="px-4 py-8 bg-gray-50/80 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-800/50 text-center shadow-sm">
+        <h4
+          class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center justify-center gap-1.5">
+          Dukung Developer
+        </h4>
+        <p class="text-[13px] text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+          Aplikasi ini gratis dan tanpa iklan. Jika terbantu, Kamu bisa mendukung developer secara sukarela (opsional).
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a href="https://saweria.co/rizzzky" target="_blank" rel="noopener noreferrer"
+            class="flex items-center gap-1.5 py-2 px-4 bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors text-sm font-medium border border-amber-200/50 dark:border-amber-900/50">
+            <Gift class="w-4 h-4" />
+            Saweria
+          </a>
+          <a href="https://ko-fi.com/rizkyprasetyo" target="_blank" rel="noopener noreferrer"
+            class="flex items-center gap-1.5 py-2 px-4 bg-rose-50 dark:bg-rose-900/10 text-rose-700 dark:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition-colors text-sm font-medium border border-rose-200/50 dark:border-rose-900/50">
+            <Coffee class="w-4 h-4" />
+            Ko-fi
+          </a>
+        </div>
+        <div class="text-center pt-20">
+          <p class="text-sm text-gray-500">Thank you for sharing!
+            <br />
+            <span>
+              Made with ❤️ by <a href="https://codebyrzky.site" target="_blank" rel="noopener noreferrer"
+                class="text-primary underline">Codebyrzky</a>
+            </span>
+          </p>
+        </div>
+      </div>
     </div>
+
   </div>
 </template>

@@ -1,0 +1,205 @@
+﻿diff --git a/app/assets/css/tailwind.css b/app/assets/css/tailwind.css
+index 5cba085..97b12f7 100644
+--- a/app/assets/css/tailwind.css
++++ b/app/assets/css/tailwind.css
+@@ -3,6 +3,8 @@
+ @custom-variant dark (&:is(.dark *));
+ 
+ @theme inline {
++  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
++  --font-heading: 'El Messiri', ui-sans-serif, system-ui, sans-serif;
+   --radius-sm: calc(var(--radius) - 4px);
+   --radius-md: calc(var(--radius) - 2px);
+   --radius-lg: var(--radius);
+@@ -113,7 +115,17 @@
+   * {
+     @apply border-border outline-ring/50;
+   }
++
+   body {
+-    @apply bg-background text-foreground;
++    @apply bg-background text-foreground font-sans;
++  }
++
++  h1,
++  h2,
++  h3,
++  h4,
++  h5,
++  h6 {
++    @apply font-heading tracking-normal;
+   }
+ }
+\ No newline at end of file
+diff --git a/app/components/map/MapContainer.vue b/app/components/map/MapContainer.vue
+index 029af2e..eddbc5a 100644
+--- a/app/components/map/MapContainer.vue
++++ b/app/components/map/MapContainer.vue
+@@ -87,6 +87,7 @@ const onSpotClick = (spot: TakjilSpot) => {
+ <style scoped>
+ :deep(.leaflet-top) {
+   margin-top: 5rem;
++  margin-left: 0.4rem;
+   /* ~80px space from top, enough for the 48px logo + padding */
+ }
+ </style>
+diff --git a/app/components/report/ReportForm.vue b/app/components/report/ReportForm.vue
+index 3bc1d5c..868ce75 100644
+--- a/app/components/report/ReportForm.vue
++++ b/app/components/report/ReportForm.vue
+@@ -245,8 +245,8 @@ const onSubmit = form.handleSubmit((values) => {
+ 
+     <!-- Submit Action -->
+     <Button type="submit" class="w-full" :disabled="isSubmitting">
+-      <Loader2 v-if="isSubmitting" class="w-4 h-4 mr-2 animate-spin" />
+-      {{ isSubmitting ? 'Saving...' : 'Submit Report' }}
++      <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
++      {{ isSubmitting ? 'Menyimpan...' : 'Kirim Laporan' }}
+     </Button>
+   </form>
+ </template>
+diff --git a/app/components/spot/SpotComments.vue b/app/components/spot/SpotComments.vue
+index f8a2c3a..1906cdb 100644
+--- a/app/components/spot/SpotComments.vue
++++ b/app/components/spot/SpotComments.vue
+@@ -238,7 +238,7 @@ const removeComment = async (comment: SpotComment) => {
+       </div>
+     </ScrollArea>
+ 
+-    <div v-else class="text-center p-6 bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-800">
++    <div v-else class="text-center px-6 py-10 bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-800">
+       <MessageSquare class="w-8 h-8 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
+       <p class="text-sm text-gray-500">Belum ada komentar</p>
+     </div>
+diff --git a/app/components/spot/SpotDetail.vue b/app/components/spot/SpotDetail.vue
+index 97c5704..8796db1 100644
+--- a/app/components/spot/SpotDetail.vue
++++ b/app/components/spot/SpotDetail.vue
+@@ -5,7 +5,7 @@ import SpotImageGallery from './SpotImageGallery.vue'
+ import SpotStatusBadge from './SpotStatusBadge.vue'
+ import { formatRelativeTime } from '~/utils/time'
+ import { useFirestore } from '~/composables/useFirestore'
+-import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag } from 'lucide-vue-next'
++import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag, Coffee, Heart, Gift } from 'lucide-vue-next'
+ import { useAppAuth } from '~/composables/useAppAuth'
+ import SpotComments from './SpotComments.vue'
+ import ReportAbuseDialog from './ReportAbuseDialog.vue'
+@@ -68,7 +68,7 @@ const handleSpotRemoved = () => {
+ </script>
+ 
+ <template>
+-  <div class="flex flex-col w-full bg-background min-h-screen pb-20">
++  <div class="flex flex-col w-full bg-background min-h-screen pb-4">
+     <SpotImageGallery :images="spot.images" />
+ 
+     <div class="p-4 flex flex-col gap-4 mt-2">
+@@ -216,14 +216,39 @@ const handleSpotRemoved = () => {
+ 
+     <ReportAbuseDialog :spot="spot" v-model:open="reportDialogOpen" @removed="handleSpotRemoved" />
+ 
+-    <div class="text-center">
+-      <p class="text-sm text-gray-500">Thank you for sharing!
+-        <br />
+-        <span>
+-          Made with Γ¥ñ∩╕Å by <a href="https://codebyrzky.site" target="_blank" rel="noopener noreferrer"
+-            class="text-primary underline">Codebyrzky</a>
+-        </span>
+-      </p>
++    <div class="mt-4 mx-4">
++      <div
++        class="px-4 py-8 bg-gray-50/80 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-800/50 text-center shadow-sm">
++        <h4
++          class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center justify-center gap-1.5">
++          Dukung Developer
++        </h4>
++        <p class="text-[13px] text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
++          Aplikasi ini gratis dan tanpa iklan. Jika terbantu, Kamu bisa mendukung developer secara sukarela (opsional).
++        </p>
++        <div class="flex flex-wrap items-center justify-center gap-3">
++          <a href="https://saweria.co/rizzzky" target="_blank" rel="noopener noreferrer"
++            class="flex items-center gap-1.5 py-2 px-4 bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors text-sm font-medium border border-amber-200/50 dark:border-amber-900/50">
++            <Gift class="w-4 h-4" />
++            Saweria
++          </a>
++          <a href="https://ko-fi.com/rizkyprasetyo" target="_blank" rel="noopener noreferrer"
++            class="flex items-center gap-1.5 py-2 px-4 bg-rose-50 dark:bg-rose-900/10 text-rose-700 dark:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition-colors text-sm font-medium border border-rose-200/50 dark:border-rose-900/50">
++            <Coffee class="w-4 h-4" />
++            Ko-fi
++          </a>
++        </div>
++        <div class="text-center pt-20">
++          <p class="text-sm text-gray-500">Thank you for sharing!
++            <br />
++            <span>
++              Made with Γ¥ñ∩╕Å by <a href="https://codebyrzky.site" target="_blank" rel="noopener noreferrer"
++                class="text-primary underline">Codebyrzky</a>
++            </span>
++          </p>
++        </div>
++      </div>
+     </div>
++
+   </div>
+ </template>
+diff --git a/app/pages/index.vue b/app/pages/index.vue
+index 9fda043..2f970fa 100644
+--- a/app/pages/index.vue
++++ b/app/pages/index.vue
+@@ -29,35 +29,35 @@ const handleLocationClick = () => {
+ 
+     <!-- Status Filter Overlay -->
+     <div class="absolute top-4 inset-x-4 z-[20] flex justify-center">
+-      <div class="flex justify-between items-center w-full">
++      <div class="flex justify-between space-x-4 items-center w-full">
+         <div class="flex items-center justify-center size-10 relative z-50 rounded-full">
+           <img src="/app_logo_base.png" alt="War Takjil Logo"
+             class="w-full h-full object-contain drop-shadow-md rounded-lg" />
+         </div>
+         <div
+-          class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[320px]">
++          class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[360px]">
+           <button @click="statusFilter = 'all'"
+             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'all' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted']">
+-            All
++            <p class="mt-1">All</p>
+           </button>
+           <button @click="statusFilter = 'available'"
+             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'available' ? 'bg-green-500 text-white' : 'text-green-600 hover:bg-green-500/10']">
+-            Available
++            <p class="mt-1">Tersedia</p>
+           </button>
+           <button @click="statusFilter = 'low_stock'"
+             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'low_stock' ? 'bg-yellow-500 text-white' : 'text-yellow-600 hover:bg-yellow-500/10']">
+-            Low Stock
++            <p class="mt-1">Hampir Habis</p>
+           </button>
+           <button @click="statusFilter = 'sold_out'"
+             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'sold_out' ? 'bg-red-500 text-white' : 'text-red-600 hover:bg-red-500/10']">
+-            Sold Out
++            <p class="mt-1">Habis</p>
+           </button>
+         </div>
+-        <SignedIn>
++        <SignedIn class="size-10">
+           <UserButton class="shrink-0" />
+         </SignedIn>
+         <SignedOut>
+-          <div class="size-8 bg-transparent rounded-full">
++          <div class="size-10 bg-transparent rounded-full">
+             <!-- should be blank if user not logged in -->
+           </div>
+         </SignedOut>
+diff --git a/nuxt.config.ts b/nuxt.config.ts
+index df8ef21..6af5e14 100644
+--- a/nuxt.config.ts
++++ b/nuxt.config.ts
+@@ -13,6 +13,9 @@ export default defineNuxtConfig({
+         { name: 'theme-color', content: '#ffffff' }
+       ],
+       link: [
++        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
++        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
++        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=El+Messiri:wght@400..700&family=Inter:wght@400;500;600;700&display=swap' },
+         { rel: 'icon', type: 'image/png', href: '/favicon-96x96.png', sizes: '96x96' },
+         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+         { rel: 'shortcut icon', href: '/favicon.ico' },

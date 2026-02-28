@@ -13,6 +13,9 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#ffffff' }
       ],
       link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=El+Messiri:wght@400..700&family=Inter:wght@400;500;600;700&display=swap' },
         { rel: 'icon', type: 'image/png', href: '/favicon-96x96.png', sizes: '96x96' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'shortcut icon', href: '/favicon.ico' },

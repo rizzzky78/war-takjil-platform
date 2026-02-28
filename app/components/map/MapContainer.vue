@@ -87,6 +87,7 @@ const onSpotClick = (spot: TakjilSpot) => {
 <style scoped>
 :deep(.leaflet-top) {
   margin-top: 5rem;
+  margin-left: 0.4rem;
   /* ~80px space from top, enough for the 48px logo + padding */
 }
 </style>

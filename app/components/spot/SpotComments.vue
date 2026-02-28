@@ -238,7 +238,7 @@ const removeComment = async (comment: SpotComment) => {
       </div>
     </ScrollArea>
 
-    <div v-else class="text-center p-6 bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-800">
+    <div v-else class="text-center px-6 py-10 bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-800">
       <MessageSquare class="w-8 h-8 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
       <p class="text-sm text-gray-500">Belum ada komentar</p>
     </div>

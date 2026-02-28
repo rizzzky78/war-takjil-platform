@@ -245,8 +245,8 @@ const onSubmit = form.handleSubmit((values) => {
 
     <!-- Submit Action -->
     <Button type="submit" class="w-full" :disabled="isSubmitting">
-      <Loader2 v-if="isSubmitting" class="w-4 h-4 mr-2 animate-spin" />
-      {{ isSubmitting ? 'Saving...' : 'Submit Report' }}
+      <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
+      {{ isSubmitting ? 'Menyimpan...' : 'Kirim Laporan' }}
     </Button>
   </form>
 </template>

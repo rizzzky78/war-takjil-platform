@@ -29,35 +29,35 @@ const handleLocationClick = () => {
 
     <!-- Status Filter Overlay -->
     <div class="absolute top-4 inset-x-4 z-[20] flex justify-center">
-      <div class="flex justify-between items-center w-full">
+      <div class="flex justify-between space-x-4 items-center w-full">
         <div class="flex items-center justify-center size-10 relative z-50 rounded-full">
           <img src="/app_logo_base.png" alt="War Takjil Logo"
             class="w-full h-full object-contain drop-shadow-md rounded-lg" />
         </div>
         <div
-          class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[320px]">
+          class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[360px]">
           <button @click="statusFilter = 'all'"
             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'all' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted']">
-            All
+            <p class="mt-1">All</p>
           </button>
           <button @click="statusFilter = 'available'"
             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'available' ? 'bg-green-500 text-white' : 'text-green-600 hover:bg-green-500/10']">
-            Available
+            <p class="mt-1">Tersedia</p>
           </button>
           <button @click="statusFilter = 'low_stock'"
             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'low_stock' ? 'bg-yellow-500 text-white' : 'text-yellow-600 hover:bg-yellow-500/10']">
-            Low Stock
+            <p class="mt-1">Hampir Habis</p>
           </button>
           <button @click="statusFilter = 'sold_out'"
             :class="['flex-1 py-2 rounded-full transition-colors', statusFilter === 'sold_out' ? 'bg-red-500 text-white' : 'text-red-600 hover:bg-red-500/10']">
-            Sold Out
+            <p class="mt-1">Habis</p>
           </button>
         </div>
-        <SignedIn>
+        <SignedIn class="size-10">
           <UserButton class="shrink-0" />
         </SignedIn>
         <SignedOut>
-          <div class="size-8 bg-transparent rounded-full">
+          <div class="size-10 bg-transparent rounded-full">
             <!-- should be blank if user not logged in -->
           </div>
         </SignedOut>
