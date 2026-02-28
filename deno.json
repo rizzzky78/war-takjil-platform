@@ -1,0 +1,31 @@
+{
+  "tasks": {
+    "dev": "nuxt dev",
+    "build": "nuxt build"
+  },
+  "imports": {
+    "~/*": "./*"
+  },
+  "lint": {
+    "include": [
+      "app/",
+      "server/",
+      "utils/"
+    ],
+    "exclude": [
+      "node_modules/",
+      ".nuxt/",
+      ".output/"
+    ]
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "deno.ns"
+    ],
+    "strict": true
+  }
+}
