@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import MapContainer from '~/components/map/MapContainer.vue'
+import SpotCard from '~/components/spot/SpotCard.vue'
+import ReportSheet from '~/components/report/ReportSheet.vue'
+import { Plus } from 'lucide-vue-next'
+import { useSpots } from '~/composables/useSpots'
+import { ref } from 'vue'
+
+const { selectedSpot, selectSpot, statusFilter } = useSpots()
+const isReportSheetOpen = ref(false)
+</script>
+
+<template>
+  <main class="h-screen w-full relative overflow-hidden">
+    <MapContainer />
+
+    <!-- Status Filter Overlay -->
+    <div class="absolute top-4 inset-x-4 z-[20] flex justify-center">
+      <div class="flex justify-between w-full">
+        <div class="w-5"></div>
+        <div
+          class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[320px]">
+          <button @click="statusFilter = 'all'"
+            :class="['flex-1 py-1.5 rounded-full transition-colors', statusFilter === 'all' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted']">
+            All
+          </button>
+          <button @click="statusFilter = 'available'"
+            :class="['flex-1 py-1.5 rounded-full transition-colors', statusFilter === 'available' ? 'bg-green-500 text-white' : 'text-green-600 hover:bg-green-500/10']">
+            Available
+          </button>
+          <button @click="statusFilter = 'low_stock'"
+            :class="['flex-1 py-1.5 rounded-full transition-colors', statusFilter === 'low_stock' ? 'bg-yellow-500 text-white' : 'text-yellow-600 hover:bg-yellow-500/10']">
+            Low Stock
+          </button>
+          <button @click="statusFilter = 'sold_out'"
+            :class="['flex-1 py-1.5 rounded-full transition-colors', statusFilter === 'sold_out' ? 'bg-red-500 text-white' : 'text-red-600 hover:bg-red-500/10']">
+            Sold Out
+          </button>
+        </div>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div>
+    </div>
+
+    <SpotCard :spot="selectedSpot" @close="selectSpot(null)" />
+
+    <!-- Add Spot Button -->
+    <div class="absolute bottom-30 lg:bottom-12 left-1/2 -translate-x-1/2 z-[20]">
+      <button @click="isReportSheetOpen = true"
+        class="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg rounded-full flex items-center justify-center gap-2 px-6 py-3 font-semibold transition-transform active:scale-95">
+        <Plus class="w-5 h-5" />
+        <span class="text-sm">Add Spot</span>
+      </button>
+    </div>
+
+    <!-- Report Sheet Component -->
+    <ReportSheet v-model:open="isReportSheetOpen" mode="create" />
+  </main>
+</template>
