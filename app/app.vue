@@ -3,8 +3,6 @@ import { onMounted } from 'vue'
 import { Toaster } from 'vue-sonner'
 import { useIndexedDB } from '~/composables/useIndexedDB'
 import { useSeoMeta, useHead } from '#imports'
-import AppLoading from '~/components/AppLoading.vue'
-import TransitionOverlay from '~/components/TransitionOverlay.vue'
 
 const { cleanupExpiredCache } = useIndexedDB()
 
