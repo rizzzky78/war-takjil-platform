@@ -3,6 +3,8 @@ import { onMounted } from 'vue'
 import { Toaster } from 'vue-sonner'
 import { useIndexedDB } from '~/composables/useIndexedDB'
 import { useSeoMeta, useHead } from '#imports'
+import AppLoading from '~/components/AppLoading.vue'
+import TransitionOverlay from '~/components/TransitionOverlay.vue'
 
 const { cleanupExpiredCache } = useIndexedDB()
 
@@ -34,6 +36,8 @@ onMounted(() => {
   <div class="bg-black w-full">
     <div
       class="max-w-full lg:max-w-md mx-auto min-h-dvh md:min-h-screen bg-background relative shadow-xl overflow-hidden sm:border-x">
+      <AppLoading />
+      <TransitionOverlay />
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>

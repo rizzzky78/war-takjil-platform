@@ -5,7 +5,7 @@ import SpotImageGallery from './SpotImageGallery.vue'
 import SpotStatusBadge from './SpotStatusBadge.vue'
 import { formatRelativeTime } from '~/utils/time'
 import { useFirestore } from '~/composables/useFirestore'
-import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag, Coffee, Heart, Gift } from 'lucide-vue-next'
+import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag, Coffee, Heart, Gift, Share2, Check } from 'lucide-vue-next'
 import { useAppAuth } from '~/composables/useAppAuth'
 import SpotComments from './SpotComments.vue'
 import ReportAbuseDialog from './ReportAbuseDialog.vue'
@@ -17,7 +17,7 @@ const props = defineProps<{
 
 const router = useRouter()
 const { getUserProfile } = useFirestore()
-const { isSignedIn } = useAppAuth()
+const { isSignedIn, user } = useAppAuth()
 const uploader = ref<AppUser | null>(null)
 const isLoadingUploader = ref(true)
 const reportDialogOpen = ref(false)
@@ -42,12 +42,28 @@ const priceLabel = computed(() => {
   }
 })
 
-// Format absolute date strings
-const formatDateString = (timestamp: number) => {
-  return new Intl.DateTimeFormat('id-ID', {
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  }).format(new Date(timestamp))
+// Format absolute time strings (HH:mm) with local timezone text
+const formatTimeString = (timestamp: number) => {
+  const date = new Date(timestamp)
+  const timeString = new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date).replace('.', ':')
+
+  // Determine local timezone label (WIB, WITA, WIT)
+  // UTC+7 (WIB) offset is -420, UTC+8 (WITA) is -480, UTC+9 (WIT) is -540
+  const offset = date.getTimezoneOffset()
+  let tzLabel = 'WIB' // default
+  if (offset === -480) tzLabel = 'WITA'
+  else if (offset === -540) tzLabel = 'WIT'
+  else if (offset !== -420) {
+    // Fallback generalized format like UTC+7
+    const sign = offset > 0 ? '-' : '+'
+    const hours = Math.abs(offset) / 60
+    tzLabel = `UTC${sign}${hours}`
+  }
+
+  return `${timeString} ${tzLabel}`
 }
 
 const censorEmail = (email: string) => {
@@ -60,6 +76,44 @@ const censorEmail = (email: string) => {
     : name + '***'
 
   return `${censoredName}@${domain}`
+}
+
+const shareSuccess = ref(false)
+const isDevSectionRevealed = ref(false)
+
+const shareSpot = async () => {
+  const url = window.location.href
+  const title = `War Takjil: ${props.spot.locationName}`
+  const text = `Cek takjil enak di ${props.spot.locationName}!`
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title,
+        text,
+        url,
+      })
+      return
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        fallbackCopy(url)
+      }
+    }
+  } else {
+    fallbackCopy(url)
+  }
+}
+
+const fallbackCopy = async (urlToCopy: string) => {
+  try {
+    await navigator.clipboard.writeText(urlToCopy)
+    shareSuccess.value = true
+    setTimeout(() => {
+      shareSuccess.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy', err)
+  }
 }
 
 const handleSpotRemoved = () => {
@@ -98,19 +152,25 @@ const handleSpotRemoved = () => {
         </div>
       </div>
 
-      <!-- Map Shortcuts -->
-      <div class="grid grid-cols-2 gap-3 mt-1 mb-2">
+      <!-- Actions -->
+      <div class="grid grid-cols-3 gap-3 mt-1 mb-2">
         <a :href="`https://www.google.com/maps/search/?api=1&query=${spot.location.latitude},${spot.location.longitude}`"
           target="_blank" rel="noopener noreferrer"
-          class="flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800/50 font-medium text-sm hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shadow-sm">
-          <MapIcon class="w-4 h-4" />
-          Google Maps
+          class="flex flex-col items-center justify-center gap-1.5 py-2.5 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-95 shadow-sm">
+          <MapIcon class="w-5 h-5" />
+          <span class="text-xs font-semibold whitespace-nowrap">G-Maps</span>
         </a>
         <a :href="`geo:${spot.location.latitude},${spot.location.longitude}?q=${spot.location.latitude},${spot.location.longitude}`"
-          class="flex items-center justify-center gap-2 py-2.5 bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-xl border border-gray-200 dark:border-gray-700 font-medium text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm">
-          <Navigation class="w-4 h-4" />
-          Peta Lainnya
+          class="flex flex-col items-center justify-center gap-1.5 py-2.5 bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 shadow-sm">
+          <Navigation class="w-5 h-5" />
+          <span class="text-xs font-semibold whitespace-nowrap">Rute</span>
         </a>
+        <button @click="shareSpot"
+          class="flex flex-col items-center justify-center gap-1.5 py-2.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all active:scale-95 shadow-sm">
+          <Check class="w-5 h-5" v-if="shareSuccess" />
+          <Share2 class="w-5 h-5" v-else />
+          <span class="text-xs font-semibold whitespace-nowrap">{{ shareSuccess ? 'Tersalin' : 'Bagikan' }}</span>
+        </button>
       </div>
 
       <!-- Description -->
@@ -119,42 +179,49 @@ const handleSpotRemoved = () => {
         <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-[15px]">{{ spot.description }}</p>
       </div>
 
+      <SpotComments :spot="spot" />
+
       <!-- Detailed Information Section -->
       <div class="mt-4 pt-4 border-t dark:border-gray-800">
         <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-3 block">Informasi Detail</h3>
-        <div class="grid grid-cols-1 gap-3">
-          <!-- Timings -->
-          <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border dark:border-gray-800">
-            <Calendar class="w-5 h-5 text-primary mt-0.5" />
-            <div class="flex flex-col">
-              <span class="text-xs font-medium text-gray-500">Waktu Ditambahkan</span>
-              <span class="text-sm text-gray-800 dark:text-gray-200">{{ formatDateString(spot.createdAt) }}</span>
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-800 p-4 flex flex-col gap-3.5">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <Calendar class="w-4 h-4" />
+              <span class="text-sm">Ditambahkan</span>
             </div>
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ formatTimeString(spot.createdAt)
+            }}</span>
           </div>
 
-          <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border dark:border-gray-800">
-            <Clock class="w-5 h-5 text-orange-500 mt-0.5" />
-            <div class="flex flex-col">
-              <span class="text-xs font-medium text-gray-500">Kedaluwarsa Pada</span>
-              <span class="text-sm text-gray-800 dark:text-gray-200">{{ formatDateString(spot.expiresAt) }}</span>
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <Clock class="w-4 h-4 text-orange-500" />
+              <span class="text-sm">Expired</span>
             </div>
+            <span class="text-sm font-medium text-orange-600 dark:text-orange-400">{{ formatTimeString(spot.expiresAt)
+            }}</span>
           </div>
 
-          <!-- Coordinates -->
-          <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border dark:border-gray-800">
-            <MapPin class="w-5 h-5 text-blue-500 mt-0.5" />
-            <div class="flex flex-col">
-              <span class="text-xs font-medium text-gray-500">Koordinat (Latitude, Longitude)</span>
-              <span class="text-sm text-gray-800 dark:text-gray-200 font-mono tracking-tighter">
-                {{ spot.location.latitude.toFixed(6) }}, {{ spot.location.longitude.toFixed(6) }}
-              </span>
+          <div class="w-full h-px bg-gray-200 dark:bg-gray-800 my-0.5"></div>
+
+          <div class="flex gap-4 justify-between items-center">
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <MapPin class="w-4 h-4" />
+              <span class="text-sm whitespace-nowrap">Koordinat</span>
+            </div>
+            <div
+              class="text-[13px] font-mono text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded truncate flex gap-2">
+              <span><span class="text-gray-400">Lat</span> {{ spot.location.latitude.toFixed(5) }}</span>
+              <span class="text-gray-300 dark:text-gray-700">|</span>
+              <span><span class="text-gray-400">Lng</span> {{ spot.location.longitude.toFixed(5) }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Uploader Information Section -->
-      <div class="mt-4 pt-4 border-t dark:border-gray-800">
+      <div class="mt-2 dark:border-gray-800">
         <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-3">Dilaporkan Oleh</h3>
 
         <div v-if="isLoadingUploader"
@@ -201,10 +268,9 @@ const handleSpotRemoved = () => {
         </div>
       </div>
 
-      <SpotComments :spot="spot" />
 
       <!-- Report Abuse Section -->
-      <div v-if="isSignedIn" class="mt-4 mb-6">
+      <div v-if="isSignedIn && user?.id !== spot.createdBy" class="mt-4 mb-6">
         <button @click="reportDialogOpen = true"
           class="w-full flex items-center justify-center gap-2 py-3 text-red-600 dark:text-red-400 font-medium text-sm hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900/50">
           <Flag class="w-4 h-4" />
@@ -217,27 +283,40 @@ const handleSpotRemoved = () => {
     <ReportAbuseDialog :spot="spot" v-model:open="reportDialogOpen" @removed="handleSpotRemoved" />
 
     <div class="mt-4 mx-4">
-      <div
-        class="px-4 py-8 bg-gray-50/80 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-800/50 text-center shadow-sm">
-        <h4
-          class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center justify-center gap-1.5">
-          Dukung Developer
-        </h4>
-        <p class="text-[13px] text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
-          Aplikasi ini gratis dan tanpa iklan. Jika terbantu, Kamu bisa mendukung developer secara sukarela (opsional).
-        </p>
-        <div class="flex flex-wrap items-center justify-center gap-3">
-          <a href="https://saweria.co/rizzzky" target="_blank" rel="noopener noreferrer"
-            class="flex items-center gap-1.5 py-2 px-4 bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors text-sm font-medium border border-amber-200/50 dark:border-amber-900/50">
-            <Gift class="w-4 h-4" />
-            Saweria
-          </a>
-          <a href="https://ko-fi.com/rizkyprasetyo" target="_blank" rel="noopener noreferrer"
-            class="flex items-center gap-1.5 py-2 px-4 bg-rose-50 dark:bg-rose-900/10 text-rose-700 dark:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition-colors text-sm font-medium border border-rose-200/50 dark:border-rose-900/50">
-            <Coffee class="w-4 h-4" />
-            Ko-fi
-          </a>
+      <div class="relative px-4 py-8 rounded-2xl text-center overflow-hidden">
+
+        <!-- Overlay for click-to-reveal -->
+        <div v-if="!isDevSectionRevealed" @click="isDevSectionRevealed = true"
+          class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-50/40 dark:bg-gray-900/40 backdrop-blur-md cursor-pointer transition-all hover:bg-gray-50/20 dark:hover:bg-gray-900/20">
+          <Heart class="w-6 h-6 text-rose-500 mb-2 animate-pulse" fill="currentColor" />
+          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Dukung Developer</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">(click me)</span>
         </div>
+
+        <!-- Hidden/Blurred Content -->
+        <div :class="{ 'blur-[3px] opacity-40 select-none': !isDevSectionRevealed, 'transition-all duration-500': true }">
+          <h4
+            class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center justify-center gap-1.5">
+            Dukung Developer
+          </h4>
+          <p class="text-[13px] text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
+            Aplikasi ini gratis dan tanpa iklan. Jika terbantu, Kamu bisa mendukung developer secara sukarela
+            (opsional).
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <a href="https://saweria.co/rizzzky" target="_blank" rel="noopener noreferrer"
+              class="flex items-center gap-1.5 py-2 px-4 bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors text-sm font-medium border border-amber-200/50 dark:border-amber-900/50">
+              <Gift class="w-4 h-4" />
+              Saweria
+            </a>
+            <a href="https://ko-fi.com/rizkyprasetyo" target="_blank" rel="noopener noreferrer"
+              class="flex items-center gap-1.5 py-2 px-4 bg-rose-50 dark:bg-rose-900/10 text-rose-700 dark:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition-colors text-sm font-medium border border-rose-200/50 dark:border-rose-900/50">
+              <Coffee class="w-4 h-4" />
+              Ko-fi
+            </a>
+          </div>
+        </div>
+
         <div class="text-center pt-20">
           <p class="text-sm text-gray-500">Thank you for sharing!
             <br />

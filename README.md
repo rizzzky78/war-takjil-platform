@@ -133,15 +133,7 @@ bun run preview
 
 ## Contributing & Constraints 🤝
 
-Contributions are welcome. Before making any changes, please check `PLAN.md` and `CONVERSATION.md` for specific technical decisions.
-
-**Critical Constraints to remember when coding:**
-
-- Always implement caching first to save Firestore reads.
-- Handle all error states comprehensively (e.g., quota exceeded, offline mode).
-- Maintain the mobile-only viewport structure.
-- Never use Firebase Storage. Strictly use Cloudinary URLs.
-- Ensure geolocation queries stick to Geohash scopes with limits attached (max 30 spots per query).
+Contributions are welcome. Before making any changes, please check `CONTRIBUTION_GUIDE.md` for specific technical decisions.
 
 ![Promotional Material](https://placehold.co/800x200?text=Join+the+War+Takjil+Community)
 *Don't miss out on your favorite takjils before iftar! Help the community by pinning your discoveries.*

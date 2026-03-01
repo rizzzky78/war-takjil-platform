@@ -173,7 +173,7 @@ const removeComment = async (comment: SpotComment) => {
       </div>
     </div>
     <div v-else class="mb-4 text-center p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-800">
-      <p class="text-sm text-gray-500">Masuk untuk memberikan komentar.</p>
+      <p class="text-sm text-gray-500">Login untuk memberikan komentar.</p>
     </div>
 
     <!-- Comments List -->

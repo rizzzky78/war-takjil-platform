@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import gsap from 'gsap'
 import { LMap, LTileLayer, LControlZoom } from '@vue-leaflet/vue-leaflet'
 import { useMap } from '~/composables/useMap'
 import { useGeolocation } from '~/composables/useGeolocation'
@@ -21,14 +22,16 @@ const handleMapReady = (map: any) => {
   fetchSpots(center.value[0], center.value[1], 5000)
 }
 
-const updateBounds = () => {
+import { useDebounceFn } from '@vueuse/core'
+
+const updateBounds = useDebounceFn(() => {
   if (!mapInstance.value) return
   const currentBounds = mapInstance.value.getBounds()
   setBounds(currentBounds)
 
   const currentCenter = mapInstance.value.getCenter()
   fetchSpots(currentCenter.lat, currentCenter.lng, 5000)
-}
+}, 500)
 
 const handleRefresh = () => {
   if (!mapInstance.value) return
@@ -46,6 +49,22 @@ watch(isLocated, (located) => {
 onMounted(() => {
   startWatch()
 })
+
+const onEnter = (el: Element, done: () => void) => {
+  gsap.fromTo(
+    el,
+    { opacity: 0, clipPath: 'inset(0 50% 0 50%)' },
+    { opacity: 1, clipPath: 'inset(0 0% 0 0%)', duration: 0.4, ease: 'back.out(1.7)', onComplete: done }
+  )
+}
+
+const onLeave = (el: Element, done: () => void) => {
+  gsap.fromTo(
+    el,
+    { opacity: 1, clipPath: 'inset(0 0% 0 0%)' },
+    { opacity: 0, clipPath: 'inset(0 50% 0 50%)', duration: 0.3, ease: 'power2.in', onComplete: done }
+  )
+}
 
 const onSpotClick = (spot: TakjilSpot) => {
   const { selectSpot } = useSpots()
@@ -66,20 +85,22 @@ const onSpotClick = (spot: TakjilSpot) => {
     <!-- Top Status Overlay (Loading / Empty) -->
     <div
       class="absolute top-20 left-1/2 -translate-x-1/2 z-[20] flex flex-col gap-2 items-center w-[90%] pointer-events-none">
-      <div v-if="loading"
-        class="bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border text-sm flex items-center gap-2 pointer-events-auto">
-        <Loader2 class="w-4 h-4 animate-spin text-primary" />
-        <span class="font-medium">Searching nearby...</span>
-      </div>
-      <div v-else-if="filteredSpots.length === 0"
-        class="bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border text-sm flex items-center gap-2 pointer-events-auto">
-        <MapPinOff class="w-4 h-4 text-muted-foreground" />
-        <span class="font-medium text-muted-foreground">No takjil spots found.</span>
-        <button @click="handleRefresh"
-          class="text-primary font-bold ml-1 flex items-center gap-1 active:scale-95 transition-transform">
-          <RefreshCcw class="w-3 h-3" /> Refresh
-        </button>
-      </div>
+      <Transition @enter="onEnter" @leave="onLeave" :css="false" mode="out-in">
+        <div v-if="loading"
+          class="bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border text-sm flex items-center gap-2 pointer-events-auto origin-top">
+          <Loader2 class="w-4 h-4 animate-spin text-primary" />
+          <span class="font-medium">Searching nearby...</span>
+        </div>
+        <div v-else-if="filteredSpots.length === 0"
+          class="bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border text-sm flex items-center gap-2 pointer-events-auto origin-top">
+          <MapPinOff class="w-4 h-4 text-muted-foreground" />
+          <span class="font-medium text-muted-foreground">No takjil spots found.</span>
+          <button @click="handleRefresh"
+            class="text-primary font-bold ml-1 flex items-center gap-1 active:scale-95 transition-transform">
+            <RefreshCcw class="w-3 h-3" /> Refresh
+          </button>
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
