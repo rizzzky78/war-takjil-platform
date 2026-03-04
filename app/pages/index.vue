@@ -3,17 +3,27 @@ import MapContainer from '~/components/map/MapContainer.vue'
 import SpotCard from '~/components/spot/SpotCard.vue'
 import ReportSheet from '~/components/report/ReportSheet.vue'
 import LocationButton from '~/components/map/LocationButton.vue'
-import { Plus } from 'lucide-vue-next'
+import UserSidebar from '~/components/user/UserSidebar.vue'
+import { Plus, User } from 'lucide-vue-next'
 import { useSpots } from '~/composables/useSpots'
 import { useGeolocation } from '~/composables/useGeolocation'
 import { useMap } from '~/composables/useMap'
+import { useAppAuth } from '~/composables/useAppAuth'
+import type { TakjilSpot } from '~/types'
 import { ref, watch, nextTick } from 'vue'
 import gsap from 'gsap'
 
 const { selectedSpot, selectSpot, statusFilter, fetchSpots } = useSpots()
 const { coords, isLocated, requestPermission } = useGeolocation()
 const { setCenter } = useMap()
+const { user, isSignedIn } = useAppAuth()
 const isReportSheetOpen = ref(false)
+const isUserSidebarOpen = ref(false)
+
+const handleViewSpotFromSidebar = (spot: TakjilSpot) => {
+  setCenter(spot.location.latitude, spot.location.longitude)
+  selectSpot(spot)
+}
 
 const handleLocationClick = () => {
   requestPermission()
@@ -68,9 +78,8 @@ watch(statusFilter, async (newVal) => {
     <!-- Status Filter Overlay -->
     <div class="absolute top-5 inset-x-4 z-[20] flex justify-center">
       <div class="flex justify-between space-x-4 items-center w-full">
-        <div class="flex items-center justify-center size-10 relative z-50 rounded-full">
-          <img src="/app_logo_base.png" alt="War Takjil Logo"
-            class="w-full h-full object-contain drop-shadow-md rounded-lg" />
+        <div class="flex items-center justify-center size-11 shrink-0 relative z-50">
+          <img src="/app_logo_base.png" alt="War Takjil Logo" class="w-full h-full object-contain rounded-xl" />
         </div>
         <div ref="filterContainer"
           class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[360px] relative">
@@ -95,15 +104,14 @@ watch(statusFilter, async (newVal) => {
             <p class="">Sold Out</p>
           </button>
         </div>
-        <SignedIn class="size-10">
-          <UserButton class="shrink-0" />
-        </SignedIn>
-        <SignedOut>
-          <div class="size-10 bg-transparent rounded-full">
-            <!-- should be blank if user not logged in -->
-          </div>
-        </SignedOut>
+        <button @click="isUserSidebarOpen = true"
+          class="size-10 shrink-0 bg-background/95 backdrop-blur-sm border shadow-md rounded-full flex items-center justify-center hover:bg-muted transition-colors overflow-hidden">
+          <img v-if="isSignedIn && user?.imageUrl" :src="user.imageUrl" alt="Profile"
+            class="w-full h-full object-cover" />
+          <User v-else class="size-5 text-muted-foreground" />
+        </button>
       </div>
+
     </div>
 
     <SpotCard :spot="selectedSpot" @close="selectSpot(null)" />
@@ -120,5 +128,8 @@ watch(statusFilter, async (newVal) => {
 
     <!-- Report Sheet Component -->
     <ReportSheet v-model:open="isReportSheetOpen" mode="create" />
+
+    <!-- User Sidebar Component -->
+    <UserSidebar v-model:open="isUserSidebarOpen" @view-spot="handleViewSpotFromSidebar" />
   </main>
 </template>

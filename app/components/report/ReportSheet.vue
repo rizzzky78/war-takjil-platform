@@ -47,12 +47,12 @@ const initialData = computed<Partial<ReportFormData>>(() => {
 
 const onSubmit = async (data: ReportFormData) => {
   if (!isSignedIn.value || !user.value) {
-    toast.error('Please login to continue')
+    toast.error('Harap login terlebih dahulu')
     return
   }
 
   if (!data.location) {
-    toast.error('Location is required')
+    toast.error('Lokasi wajib diisi')
     return
   }
 
@@ -95,7 +95,7 @@ const onSubmit = async (data: ReportFormData) => {
         expiresAt: twoHoursRef
       })
 
-      toast.success('Spot updated successfully!')
+      toast.success('Spot berhasil diperbarui')
       emit('success', props.existingSpot.id)
     } else {
       // Create new spot
@@ -116,7 +116,7 @@ const onSubmit = async (data: ReportFormData) => {
         expiresAt: twoHoursRef
       })
 
-      toast.success('Spot added successfully!')
+      toast.success('Spot berhasil ditambahkan')
       emit('success', spotId)
     }
 
@@ -127,7 +127,7 @@ const onSubmit = async (data: ReportFormData) => {
     emit('update:open', false)
   } catch (error) {
     console.error('Failed to submit report', error)
-    toast.error('Failed to submit report. Please try again.')
+    toast.error('Gagal menyimpan spot. Silakan coba lagi')
   } finally {
     isSubmitting.value = false
   }
@@ -139,7 +139,7 @@ const onSubmit = async (data: ReportFormData) => {
     <DialogContent class="max-h-[90vh] overflow-y-auto max-w-md md:px-4 pb-8 pt-6 rounded-xl lg:max-w-md">
       <DialogHeader class="mb-4 text-left">
         <DialogTitle class="text-xl">
-          {{ mode === 'update' ? 'Update Takjil Spot' : 'Add New Takjil Spot' }}
+          {{ mode === 'update' ? 'Update Takjil Spot' : 'Tambah Spot Takjil Baru' }}
         </DialogTitle>
         <DialogDescription v-if="mode === 'create'" class="text-sm">
           Bantu sesama menemukan takjil terbaik! Pin ini akan otomatis hilang setelah 2 jam.
@@ -153,7 +153,7 @@ const onSubmit = async (data: ReportFormData) => {
         class="p-6 text-center border rounded-lg bg-muted flex flex-col items-center justify-center space-y-3">
         <p class="text-sm font-medium">Kamu harus login untuk melaporkan spot.</p>
         <div class="flex w-full gap-2 mt-2 justify-center">
-          <Button class="rounded-full" size="lg" @click="() => signIn()">Sign In / Register</Button>
+          <Button class="rounded-full" size="lg" @click="() => signIn()">Login / Daftar</Button>
           <!-- Show the user button when the user is signed in -->
         </div>
       </div>

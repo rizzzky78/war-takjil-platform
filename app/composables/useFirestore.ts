@@ -105,6 +105,14 @@ export const useFirestore = () => {
     return null
   }
 
+  const getUserSpots = async (userId: string): Promise<TakjilSpot[]> => {
+    const q = query(spotsRef, where('createdBy', '==', userId))
+    const snapshot = await getDocs(q)
+    const spots = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as TakjilSpot)
+    // Sort client-side to avoid needing a Firestore composite index
+    return spots.sort((a, b) => b.createdAt - a.createdAt)
+  }
+
   const submitAbuseReport = async (
     spotId: string,
     currentSpot: TakjilSpot,
@@ -176,6 +184,7 @@ export const useFirestore = () => {
     addReport,
     getSpotReports,
     getUserProfile,
+    getUserSpots,
     submitAbuseReport,
     addComment,
     updateComment,

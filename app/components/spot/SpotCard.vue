@@ -85,7 +85,7 @@ const handleDelete = async () => {
 </script>
 
 <template>
-  <div v-if="spot" class="absolute bottom-10 md:bottom-4 left-4 right-4 z-[1000] animate-in slide-in-from-bottom-5">
+  <div v-if="spot" class="absolute bottom-10 md:bottom-4 left-4 right-4 z-[25] animate-in slide-in-from-bottom-5">
     <Card class="w-full relative shadow-xl border-t-4 border-t-green-700/50 cursor-pointer" @click="goToDetail">
 
       <!-- Actions Context (Top Right) -->

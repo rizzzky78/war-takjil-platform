@@ -37,6 +37,7 @@
     "idb": "^8.0.3",
     "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.575.0",
+    "marked": "^17.0.3",
     "nuxt": "^4.3.1",
     "reka-ui": "^2.8.2",
     "shadcn-nuxt": "^2.4.3",
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
+    "@types/marked": "^6.0.0",
     "@vite-pwa/nuxt": "^1.1.1",
     "cross-env": "^10.1.0",
     "tailwindcss": "^4.2.1",
