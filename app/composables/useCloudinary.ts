@@ -14,7 +14,7 @@ export function useCloudinary() {
   /**
    * Upload an image file to Cloudinary using unsigned upload.
    */
-  const uploadImage = async (file: File) => {
+  const uploadImage = async (file: File, uploaderId?: string) => {
     isUploading.value = true
     error.value = null
     uploadProgress.value = 0
@@ -27,6 +27,12 @@ export function useCloudinary() {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('upload_preset', uploadPreset)
+
+      if (uploaderId) {
+        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name
+        const sanitizedName = baseName.replace(/[^a-zA-Z0-9]/g, '_')
+        formData.append('public_id', `${uploaderId}_${sanitizedName}`)
+      }
 
       // Basic fetch - could use XMLHttpRequest if progress tracking is strictly required
       const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {

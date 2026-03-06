@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { Camera, X, Loader2, ImagePlus } from 'lucide-vue-next'
 import { compressImage } from '~/utils/image'
 import { useCloudinary } from '~/composables/useCloudinary'
+import { useAppAuth } from '~/composables/useAppAuth'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
 
@@ -26,6 +27,7 @@ const maxImages = props.maxImages || 3
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const { uploadImage, isUploading, uploadProgress, error } = useCloudinary()
+const { user } = useAppAuth()
 
 // Handle file selection
 const onFileSelected = async (event: Event) => {
@@ -46,7 +48,8 @@ const onFileSelected = async (event: Event) => {
       const compressedFile = await compressImage(file)
 
       // 2. Upload
-      const result = await uploadImage(compressedFile)
+      const uploaderId = user.value?.username || user.value?.id || 'anonymous'
+      const result = await uploadImage(compressedFile, uploaderId)
 
       // 3. Emit update
       const newImage: UploadedImage = {
