@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
+import gsap from 'gsap'
 import { Card, CardFooter } from '~/components/ui/card'
 import SpotStatusBadge from './SpotStatusBadge.vue'
 import { formatRelativeTime } from '~/utils/time'
 import type { TakjilSpot } from '~/types'
 import { useRouter } from 'vue-router'
-import { Trash2, Loader2 } from 'lucide-vue-next'
+import { Trash2, Loader2, ShieldCheck } from 'lucide-vue-next'
 import { useAppAuth } from '~/composables/useAppAuth'
 import { useFirestore } from '~/composables/useFirestore'
 import { useSpots } from '~/composables/useSpots'
@@ -37,6 +38,21 @@ const { fetchSpots } = useSpots()
 
 const isDeleting = ref(false)
 const isDialogOpen = ref(false)
+const contentElement = ref<HTMLElement | null>(null)
+
+watch(() => props.spot, async (newSpot, oldSpot) => {
+  if (newSpot && newSpot.id !== oldSpot?.id) {
+    if (!oldSpot) return // let the animate-in handle the first mount
+
+    await nextTick()
+    if (contentElement.value) {
+      gsap.fromTo(contentElement.value,
+        { opacity: 0, x: -10 },
+        { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out', clearProps: 'all' }
+      )
+    }
+  }
+})
 
 const timeAgo = computed(() => {
   if (!props.spot) return ''
@@ -85,8 +101,10 @@ const handleDelete = async () => {
 </script>
 
 <template>
-  <div v-if="spot" class="absolute bottom-10 md:bottom-4 left-4 right-4 z-[25] animate-in slide-in-from-bottom-5">
-    <Card class="w-full relative shadow-xl border-t-4 border-t-green-700/50 cursor-pointer" @click="goToDetail">
+  <div v-if="spot"
+    class="absolute bottom-20 md:bottom-4 left-4 right-4 z-[25] animate-in slide-in-from-bottom-5 fade-in duration-300">
+    <Card class="w-full relative shadow-xl border-t-4 border-t-green-700/50 cursor-pointer overflow-hidden"
+      @click="goToDetail">
 
       <!-- Actions Context (Top Right) -->
       <div class="absolute right-2 top-2 flex items-center gap-2 z-10">
@@ -129,27 +147,37 @@ const handleDelete = async () => {
         </button>
       </div>
 
-      <div class="flex p-4 gap-4 items-center mt-2">
+      <div ref="contentElement" class="flex px-6 gap-3 items-center mt-2">
         <!-- Thumbnail -->
         <div v-if="thumbnailUrl"
-          class="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800 border">
+          class="size-28 rounded-md overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800 border">
           <img :src="thumbnailUrl" alt="Spot preview" class="w-full h-full object-cover" />
         </div>
         <div v-else
-          class="w-20 h-20 rounded-md flex-shrink-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-3xl border">
+          class="size-28 rounded-md flex-shrink-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-3xl border">
           🍽️
         </div>
 
         <!-- Info -->
         <div class="flex-1 min-w-0 pr-2">
-          <h3 class="font-bold text-lg leading-tight truncate">{{ spot.locationName }}</h3>
-          <p v-if="spot.description" class="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
+
+          <h3 class="font-bold text-lg leading-tight truncate" :class="{ 'mt-0': spot.isSellerManaged }">{{
+            spot.locationName }}</h3>
+          <p v-if="spot.description" class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-4">
             {{ spot.description }}
           </p>
 
-          <div class="flex items-center gap-2 mt-2">
-            <SpotStatusBadge :status="spot.status" />
-            <span class="text-xs text-gray-500 dark:text-gray-400">Ditambahkan {{ timeAgo }}</span>
+          <div class="flex flex-col space-y-1 mt-1.5">
+            <div class="flex items-center space-x-2">
+              <div class="flex items-center gap-2" v-if="spot.isSellerManaged">
+                <span
+                  class="inline-flex items-center gap-1 pl-1 pr-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">
+                  <ShieldCheck class="w-3 h-3 text-green-500" /> Penjual
+                </span>
+              </div>
+              <SpotStatusBadge :status="spot.status" />
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400">Ditambahkan: {{ timeAgo }}</span>
           </div>
         </div>
       </div>

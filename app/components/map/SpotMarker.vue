@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { LMarker, LIcon } from '@vue-leaflet/vue-leaflet'
 import { Store } from 'lucide-vue-next'
 import type { TakjilSpot } from '~/types'
+import { useMap } from '~/composables/useMap'
 
 const props = defineProps<{
   spot: TakjilSpot
@@ -37,6 +38,7 @@ const statusConfig = computed(() => {
   }
 })
 
+const { zoom } = useMap()
 const position = computed(() => [props.spot.location.latitude, props.spot.location.longitude] as [number, number])
 </script>
 
@@ -72,6 +74,12 @@ const position = computed(() => [props.spot.location.latitude, props.spot.locati
         <!-- Drop Shadow directly under -->
         <div
           class="absolute bottom-0 w-6 h-1.5 bg-black/20 rounded-[50%] blur-[2px] transition-all duration-300 group-hover:scale-75 group-hover:opacity-40">
+        </div>
+
+        <!-- Spot Name Label -->
+        <div v-if="zoom >= 14"
+          class="absolute top-[58px] left-1/2 -translate-x-1/2 whitespace-nowrap bg-background/95 backdrop-blur-sm px-1.5 py-0.5 rounded-sm shadow border text-[9px] font-bold text-foreground pointer-events-none transition-all duration-300 transform scale-100 origin-top animate-in fade-in zoom-in-95">
+          {{ spot.locationName }}
         </div>
       </div>
     </LIcon>

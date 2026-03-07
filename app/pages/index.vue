@@ -4,6 +4,7 @@ import SpotCard from '~/components/spot/SpotCard.vue'
 import ReportSheet from '~/components/report/ReportSheet.vue'
 import LocationButton from '~/components/map/LocationButton.vue'
 import UserSidebar from '~/components/user/UserSidebar.vue'
+import SpotSearch from '~/components/spot/SpotSearch.vue'
 import { Plus, User } from 'lucide-vue-next'
 import { useSpots } from '~/composables/useSpots'
 import { useGeolocation } from '~/composables/useGeolocation'
@@ -75,43 +76,53 @@ watch(statusFilter, async (newVal) => {
   <main class="h-screen w-full relative overflow-hidden">
     <MapContainer />
 
-    <!-- Status Filter Overlay -->
-    <div class="absolute top-5 inset-x-4 z-[20] flex justify-center">
-      <div class="flex justify-between space-x-4 items-center w-full">
-        <div class="flex items-center justify-center size-11 shrink-0 relative z-50">
-          <img src="/app_logo_base.png" alt="War Takjil Logo" class="w-full h-full object-contain rounded-xl" />
-        </div>
-        <div ref="filterContainer"
-          class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[360px] relative">
-
-          <!-- Animated Active Background -->
-          <div ref="activeBg" class="absolute top-1 bottom-1 rounded-full z-0" style="left: 0; width: 0px;"></div>
-
-          <button @click="statusFilter = 'all'"
-            :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'all' ? 'text-primary-foreground bg-[#1f2937]' : 'text-muted-foreground hover:bg-muted']">
-            <p class="">All</p>
-          </button>
-          <button @click=" statusFilter = 'available'" :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'available'
-            ? 'text-white' : 'text-green-600 hover:bg-green-500/10']">
-            <p class="">Available</p>
-          </button>
-          <button @click="statusFilter = 'low_stock'"
-            :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'low_stock' ? 'text-white' : 'text-yellow-600 hover:bg-yellow-500/10']">
-            <p class="">Low Stock</p>
-          </button>
-          <button @click="statusFilter = 'sold_out'"
-            :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'sold_out' ? 'text-white' : 'text-red-600 hover:bg-red-500/10']">
-            <p class="">Sold Out</p>
-          </button>
-        </div>
-        <button @click="isUserSidebarOpen = true"
-          class="size-10 shrink-0 bg-background/95 backdrop-blur-sm border shadow-md rounded-full flex items-center justify-center hover:bg-muted transition-colors overflow-hidden">
-          <img v-if="isSignedIn && user?.imageUrl" :src="user.imageUrl" alt="Profile"
-            class="w-full h-full object-cover" />
-          <User v-else class="size-5 text-muted-foreground" />
-        </button>
+    <!-- Top Controls: Logo, Search, Profile -->
+    <div class="absolute top-4 inset-x-4 z-[30] flex justify-between gap-3 items-start pointer-events-none">
+      <!-- Logo -->
+      <div
+        class="size-12 shrink-0 bg-background/95 backdrop-blur-sm rounded-2xl shadow-md p-1 pointer-events-auto relative z-50">
+        <img src="/app_logo_base.png" alt="War Takjil Logo" class="w-full h-full object-contain rounded-xl" />
       </div>
 
+      <!-- Search Bar -->
+      <div class="flex-1 max-w-sm pointer-events-auto">
+        <SpotSearch />
+      </div>
+
+      <!-- Profile Button -->
+      <button @click="isUserSidebarOpen = true"
+        class="size-12 shrink-0 bg-background/95 backdrop-blur-sm border shadow-md rounded-2xl flex items-center justify-center hover:bg-muted transition-colors overflow-hidden pointer-events-auto">
+        <img v-if="isSignedIn && user?.imageUrl" :src="user.imageUrl" alt="Profile"
+          class="w-full h-full object-cover" />
+        <User v-else class="size-5 text-muted-foreground" />
+      </button>
+    </div>
+
+    <!-- Status Filter Overlay -->
+    <div class="absolute top-[76px] inset-x-4 z-[20] flex justify-center pointer-events-none">
+      <div ref="filterContainer"
+        class="bg-background/95 backdrop-blur-sm shadow-md border rounded-full overflow-hidden flex text-xs font-semibold p-1 gap-1 w-full max-w-[360px] relative pointer-events-auto">
+
+        <!-- Animated Active Background -->
+        <div ref="activeBg" class="absolute top-1 bottom-1 rounded-full z-0" style="left: 0; width: 0px;"></div>
+
+        <button @click="statusFilter = 'all'"
+          :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'all' ? 'text-primary-foreground bg-[#1f2937]' : 'text-muted-foreground hover:bg-muted']">
+          <p class="">All</p>
+        </button>
+        <button @click=" statusFilter = 'available'" :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'available'
+          ? 'text-white' : 'text-green-600 hover:bg-green-500/10']">
+          <p class="">Available</p>
+        </button>
+        <button @click="statusFilter = 'low_stock'"
+          :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'low_stock' ? 'text-white' : 'text-yellow-600 hover:bg-yellow-500/10']">
+          <p class="">Low Stock</p>
+        </button>
+        <button @click="statusFilter = 'sold_out'"
+          :class="['flex-1 py-2 rounded-full transition-colors z-10', statusFilter === 'sold_out' ? 'text-white' : 'text-red-600 hover:bg-red-500/10']">
+          <p class="">Sold Out</p>
+        </button>
+      </div>
     </div>
 
     <SpotCard :spot="selectedSpot" @close="selectSpot(null)" />

@@ -5,7 +5,7 @@ import SpotImageGallery from './SpotImageGallery.vue'
 import SpotStatusBadge from './SpotStatusBadge.vue'
 import { formatRelativeTime } from '~/utils/time'
 import { useFirestore } from '~/composables/useFirestore'
-import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag, Coffee, Heart, Gift, Share2, Check } from 'lucide-vue-next'
+import { MapPin, Clock, Calendar, ShieldCheck, User as UserIcon, Map as MapIcon, Navigation, Flag, Coffee, Heart, Gift, Share2, Check, MessageCircle } from 'lucide-vue-next'
 import { useAppAuth } from '~/composables/useAppAuth'
 import SpotComments from './SpotComments.vue'
 import ReportAbuseDialog from './ReportAbuseDialog.vue'
@@ -119,16 +119,31 @@ const fallbackCopy = async (urlToCopy: string) => {
 const handleSpotRemoved = () => {
   router.push('/')
 }
+
+const formatWhatsAppNumber = (contact: string) => {
+  if (!contact) return ''
+  let cleaned = contact.replace(/\D/g, '')
+  if (cleaned.startsWith('0')) {
+    cleaned = '62' + cleaned.substring(1)
+  }
+  return cleaned
+}
 </script>
 
 <template>
   <div class="flex flex-col w-full bg-background min-h-screen pb-4">
     <SpotImageGallery :images="spot.images" />
 
-    <div class="p-4 flex flex-col gap-4 mt-2">
+    <div class="p-4 flex flex-col gap-3 mt-2">
       <!-- Title & Status -->
-      <div class="flex justify-between items-start gap-4">
+      <div class="flex justify-between items-start gap-4 mb-3">
         <div>
+          <div class="flex items-center gap-2 mb-1.5" v-if="spot.isSellerManaged">
+            <span
+              class="inline-flex items-center gap-1 pl-1 pr-2 py-0.5 rounded-sm text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">
+              <ShieldCheck class="w-3 h-3" /> Dikelola Penjual
+            </span>
+          </div>
           <h1 class="text-2xl font-bold leading-tight text-gray-900 dark:text-gray-50">{{ spot.locationName }}</h1>
           <p v-if="spot.address" class="text-gray-500 text-sm mt-1 flex items-start gap-1">
             <MapPin class="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -152,8 +167,27 @@ const handleSpotRemoved = () => {
         </div>
       </div>
 
+      <!-- Seller Contact -->
+      <div v-if="spot.isSellerManaged && spot.sellerContact" class="">
+        <a :href="`https://wa.me/${formatWhatsAppNumber(spot.sellerContact)}`" target="_blank" rel="noopener noreferrer"
+          class="flex items-center justify-between p-3.5 bg-gradient-to-r from-green-600/80 to-emerald-600/80 hover:from-green-600/80 hover:to-emerald-700 text-white rounded-xl shadow-sm transition-all active:scale-[0.98]">
+          <div class="flex items-center gap-3">
+            <div class="bg-white/20 p-2 rounded-lg">
+              <MessageCircle class="w-5 h-5 text-white" />
+            </div>
+            <div class="flex flex-col text-left">
+              <span class="text-sm font-bold leading-none mb-1">Hubungi Penjual</span>
+              <span class="text-xs text-green-50 font-medium">{{ spot.sellerContact }}</span>
+            </div>
+          </div>
+          <div class="bg-white/20 px-3 py-1.5 rounded-lg text-xs font-bold mr-1">
+            Chat WA
+          </div>
+        </a>
+      </div>
+
       <!-- Actions -->
-      <div class="grid grid-cols-3 gap-3 mt-1 mb-2">
+      <div class="grid grid-cols-3 gap-3 mb-2">
         <a :href="`https://www.google.com/maps/search/?api=1&query=${spot.location.latitude},${spot.location.longitude}`"
           target="_blank" rel="noopener noreferrer"
           class="flex flex-col items-center justify-center gap-1.5 py-2.5 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-95 shadow-sm">
@@ -294,7 +328,8 @@ const handleSpotRemoved = () => {
         </div>
 
         <!-- Hidden/Blurred Content -->
-        <div :class="{ 'blur-[3px] opacity-40 select-none': !isDevSectionRevealed, 'transition-all duration-500': true }">
+        <div
+          :class="{ 'blur-[3px] opacity-40 select-none': !isDevSectionRevealed, 'transition-all duration-500': true }">
           <h4
             class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center justify-center gap-1.5">
             Dukung Developer
@@ -322,7 +357,7 @@ const handleSpotRemoved = () => {
             <br />
             <span>
               Made with ❤️ by <a href="https://codebyrzky.site" target="_blank" rel="noopener noreferrer"
-                class="text-primary underline">Codebyrzky</a>
+                class="text-primary underline">codebyrzky</a>
             </span>
           </p>
         </div>

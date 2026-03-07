@@ -84,7 +84,7 @@ const onSpotClick = (spot: TakjilSpot) => {
 
     <!-- Top Status Overlay (Loading / Empty) -->
     <div
-      class="absolute top-20 left-1/2 -translate-x-1/2 z-[20] flex flex-col gap-2 items-center w-[90%] pointer-events-none">
+      class="absolute top-[132px] left-1/2 -translate-x-1/2 z-[20] flex flex-col gap-2 items-center w-[90%] pointer-events-none">
       <Transition @enter="onEnter" @leave="onLeave" :css="false" mode="out-in">
         <div v-if="loading"
           class="bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-md border text-sm flex items-center gap-2 pointer-events-auto origin-top">
@@ -107,8 +107,7 @@ const onSpotClick = (spot: TakjilSpot) => {
 
 <style scoped>
 :deep(.leaflet-top) {
-  margin-top: 5rem;
+  margin-top: 8rem;
   margin-left: 0.4rem;
-  /* ~80px space from top, enough for the 48px logo + padding */
 }
 </style>
