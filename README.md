@@ -1,6 +1,6 @@
 # War Takjil 🌙
 
-![War Takjil Logo](https://placehold.co/800x300?text=War+Takjil+Logo)
+![War Takjil Logo](/public/3_7_2026_12_35_24_contentcore.xyz.png)
 *A crowdsourced takjil tracker helping you find the best spots during the holy month of Ramadan.*
 
 **War Takjil** is a mobile-first web app designed for real-time takjil (Indonesian breaking-fast food) tracking. It is an open, crowdsourced map platform where users can discover and report takjil sellers' locations, statuses, and availability in real-time, right before iftar.
@@ -21,11 +21,16 @@ Every Ramadan, people face the same frustrations:
 
 - **Real-time Map:** Live heatmap and markers of takjil sellers around your area. Green for "Available", Yellow for "Low Stock", and Red for "Sold Out".
 - **Instant Reporting:** Drop a pin, take a quick photo, and set the status in 3 simple taps.
-- **Status Updates:** Live tracking of seller inventory statuses with auto-expiring reports to ensure freshness. Old reports automatically expire after 2 hours.
+- **Spot Search:** Easily search for specific takjil spots by name with visual search results.
+- **User Dashboard & Spot Management:** Log in with Google to view, edit, delete, or share the spots you've added via a convenient sidebar.
+- **WhatsApp Integration:** Contact sellers directly via "Hubungi Penjual" for booking or availability checks.
+- **Status Updates:** Live tracking of seller inventory statuses with auto-expiring reports to ensure freshness.
+- **Share Locations:** Easily share your favorite takjil spots with friends and family via social media or shareable links.
 - **Client-Side Caching:** Optimized with aggressive IndexedDB caching for blazing-fast, offline-ready performance.
+- **Smooth Animations:** GSAP-powered page transitions and map status overlays for a premium feel.
 - **Mobile-First Focus:** Designed exclusively for mobile viewports, perfect for quick on-the-go checking before iftar.
 
-![Map View](https://placehold.co/400x800?text=Mobile+Map+Interface)
+![Map View](/public/Screenshot_2026-03-07-12-20-49-550_com.android.chrome.jpg)
 *The main map interface displaying green, yellow, and red pins representing takjil spots, optimized for a seamless mobile experience.*
 
 ---
@@ -41,6 +46,7 @@ This project is built for speed, real-time updates without backend complexities,
 - **Authentication:** Clerk (Google OAuth integration for reporters and sellers)
 - **Image Processing:** Cloudinary (Direct Upload) with client-side compression via CompressorJS
 - **Maps Setup:** Leaflet.js with OpenStreetMap (via Vue-Leaflet)
+- **Animations:** GSAP (Page transitions & Map overlays)
 - **Storage/Caching:** IndexedDB integration for an aggressive local cache-first strategy.
 
 ---
@@ -64,8 +70,8 @@ graph TD
 
 1. **Map Tracking:** Map viewport changes natively trigger Geohash-based bounding box calculations on the client.
 2. **Caching First:** Requests intercept the local IndexedDB layer for a 5-minute TTL cache before hitting Firestore, ensuring we stay within Firebase Free Tier limits (<10 reads per user).
-3. **Data Integrity:** Reports expire automatically in 2 hours via Firestore TTL policies and client filtering, ensuring data is always fresh and accurate.
-4. **Optimized Images:** Spot photos are compressed directly on the client (max 1920px, 80% quality) and sent securely to Cloudinary, ensuring no heavy data transfer. NO Firebase Storage is used.
+3. **Data Integrity:** Reports expire automatically in 2 hours via Firestore TTL policies and client filtering, ensuring data is always fresh and accurate. A secure cleanup API route handles daily purges for a clean database.
+4. **Optimized Images:** Spot photos are compressed directly on the client (max 1920px, 80% quality) and sent securely to Cloudinary (preventing duplicates via filename/username hashing), ensuring no heavy data transfer. NO Firebase Storage is used.
 
 ---
 
@@ -112,7 +118,7 @@ Start the application on `http://localhost:3000`:
 bun run dev
 ```
 
-![Spot Details](https://placehold.co/400x800?text=Spot+Detail+%26+Report)
+![Spot Details](/public/Screenshot_2026-03-07-12-20-15-927_com.android.chrome.jpg)
 *Users can easily report stock availability, take photos of the stalls, and view details about the takjil menus right from their browser.*
 
 ### 5. Production Build
@@ -135,5 +141,5 @@ bun run preview
 
 Contributions are welcome. Before making any changes, please check `CONTRIBUTION_GUIDE.md` for specific technical decisions.
 
-![Promotional Material](https://placehold.co/800x200?text=Join+the+War+Takjil+Community)
+![Promotional Material](/public/og_image.png)
 *Don't miss out on your favorite takjils before iftar! Help the community by pinning your discoveries.*
